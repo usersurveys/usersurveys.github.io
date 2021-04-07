@@ -1,0 +1,2201 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>User Surveys</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+      }
+      .control-group {
+        display: block;
+        /* vertical-align: top; */
+        background: #fff;
+        text-align: left;
+        padding: 5px;
+        width: 655px;
+        margin: 3px;
+      }
+      .control {
+        display: block;
+        position: relative;
+        padding-left: 30px;
+        margin-bottom: 15px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      .control input {
+        position: absolute;
+        z-index: -1;
+        opacity: 0;
+      }
+      .control__indicator {
+        position: absolute;
+        top: 2px;
+        left: 0;
+        height: 20px;
+        width: 20px;
+        background: #e6e6e6;
+      }
+      .control--radio .control__indicator {
+        border-radius: 50%;
+      }
+      .control:hover input ~ .control__indicator,
+      .control input:focus ~ .control__indicator {
+        background: #ccc;
+      }
+      .control input:checked ~ .control__indicator {
+        background: #673ab7;
+      }
+      .control:hover input:not([disabled]):checked ~ .control__indicator,
+      .control input:checked:focus ~ .control__indicator {
+        background: #673ab7;
+      }
+      .control input:disabled ~ .control__indicator {
+        background: #ccc;
+        opacity: 0.6;
+        pointer-events: none;
+      }
+      .control__indicator:after {
+        content: "";
+        position: absolute;
+        display: none;
+      }
+      .control input:checked ~ .control__indicator:after {
+        display: block;
+      }
+      .control--checkbox .control__indicator:after {
+        left: 8px;
+        top: 4px;
+        width: 3px;
+        height: 8px;
+        border: solid #fff;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+      }
+      .control--checkbox input:disabled ~ .control__indicator:after {
+        border-color: #7b7b7b;
+      }
+      .control--radio .control__indicator:after {
+        left: 7px;
+        top: 7px;
+        height: 6px;
+        width: 6px;
+        border-radius: 50%;
+        background: #fff;
+      }
+      .control--radio input:disabled ~ .control__indicator:after {
+        background: #7b7b7b;
+      }
+
+      html {
+        height: 100%;
+      }
+
+      p {
+        color: grey;
+      }
+
+      #heading {
+        text-transform: uppercase;
+        color: #673ab7;
+        font-weight: normal;
+      }
+
+      #msform {
+        text-align: center;
+        position: relative;
+        margin-top: 20px;
+      }
+
+      #msform fieldset {
+        background: white;
+        border: 0 none;
+        border-radius: 0.5rem;
+        box-sizing: border-box;
+        width: 100%;
+        margin: 0;
+        padding-bottom: 20px;
+        position: relative;
+      }
+
+      .form-card {
+        text-align: left;
+      }
+
+      #msform fieldset:not(:first-of-type) {
+        display: none;
+      }
+
+      #msform input,
+      #msform textarea {
+        padding: 8px 15px 8px 15px;
+        border: 1px solid #ccc;
+        border-radius: 0px;
+        margin-bottom: 25px;
+        margin-top: 2px;
+        width: 100%;
+        box-sizing: border-box;
+        font-family: montserrat;
+        color: #2c3e50;
+        background-color: #eceff1;
+        font-size: 16px;
+        letter-spacing: 1px;
+      }
+
+      #msform input:focus,
+      #msform textarea:focus {
+        -moz-box-shadow: none !important;
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+        border: 1px solid #673ab7;
+        outline-width: 0;
+      }
+
+      #msform .action-button {
+        width: 200px;
+        background: #673ab7;
+        font-weight: bold;
+        color: white;
+        border: 0 none;
+        border-radius: 0px;
+        cursor: pointer;
+        padding: 10px 5px;
+        margin: 10px 0px 10px 5px;
+        float: right;
+      }
+
+      #msform .action-button:hover,
+      #msform .action-button:focus {
+        background-color: #311b92;
+      }
+
+      #msform .action-button-previous {
+        width: 200px;
+        background: #616161;
+        font-weight: bold;
+        color: white;
+        border: 0 none;
+        border-radius: 0px;
+        cursor: pointer;
+        padding: 10px 5px;
+        margin: 10px 5px 10px 0px;
+        float: right;
+      }
+      mark.red {
+        color: #ff0000;
+        background: none;
+      }
+      #msform .action-button-previous:hover,
+      #msform .action-button-previous:focus {
+        background-color: #000000;
+      }
+
+      .card {
+        z-index: 0;
+        border: none;
+        position: relative;
+      }
+
+      .fs-title {
+        font-size: 25px;
+        color: #673ab7;
+        margin-bottom: 15px;
+        font-weight: normal;
+        text-align: left;
+      }
+
+      .purple-text {
+        color: #673ab7;
+        font-weight: normal;
+      }
+
+      .steps {
+        font-size: 25px;
+        color: gray;
+        margin-bottom: 10px;
+        font-weight: normal;
+        text-align: right;
+      }
+
+      .fieldlabels {
+        color: gray;
+        text-align: left;
+      }
+
+      #progressbar {
+        margin-bottom: 30px;
+        overflow: hidden;
+        color: lightgrey;
+        text-align: center;
+      }
+
+      #progressbar .active {
+        color: #673ab7;
+      }
+
+      #progressbar li {
+        list-style-type: none;
+        font-size: 15px;
+        width: 25%;
+        float: left;
+        position: relative;
+        font-weight: 400;
+      }
+
+      #progressbar #account:before {
+        font-family: FontAwesome;
+        content: "\f13e";
+      }
+
+      #progressbar #personal:before {
+        font-family: FontAwesome;
+        content: "\f007";
+      }
+
+      #progressbar #payment:before {
+        font-family: FontAwesome;
+        content: "\f030";
+      }
+
+      #progressbar #confirm:before {
+        font-family: FontAwesome;
+        content: "\f00c";
+      }
+
+      #progressbar li:before {
+        width: 50px;
+        height: 50px;
+        line-height: 45px;
+        display: block;
+        font-size: 20px;
+        color: #ffffff;
+        background: lightgray;
+        border-radius: 50%;
+        margin: 0 auto 10px auto;
+        padding: 2px;
+      }
+
+      #progressbar li:after {
+        content: "";
+        width: 100%;
+        height: 2px;
+        background: lightgray;
+        position: absolute;
+        left: 0;
+        top: 25px;
+        z-index: -1;
+      }
+
+      #progressbar li.active:before,
+      #progressbar li.active:after {
+        background: #673ab7;
+      }
+
+      .progress {
+        height: 20px;
+      }
+
+      .progress-bar {
+        background-color: #673ab7;
+      }
+
+      .fit-image {
+        width: 100%;
+        object-fit: cover;
+      }
+    </style>
+
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"
+      integrity="sha384-SR1sx49pcuLnqZUnnPwx6FCym0wLsk5JZuNx2bPPENzswTNFaQU1RDvt3wT4gWFG"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js"
+      integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"
+    ></script>
+
+    <script type="text/javascript">
+      $(document).ready(function () {
+        var current_fs, next_fs, previous_fs; //fieldsets
+        var opacity;
+        var current = 1;
+        var steps = $("fieldset").length;
+
+        setProgressBar(current);
+
+        $(".next").click(function () {
+          current_fs = $(this).parent();
+          next_fs = $(this).parent().next();
+
+          //Add Class Active
+          $("#progressbar li")
+            .eq($("fieldset").index(next_fs))
+            .addClass("active");
+
+          //show the next fieldset
+          next_fs.show();
+          //hide the current fieldset with style
+          current_fs.animate(
+            { opacity: 0 },
+            {
+              step: function (now) {
+                // for making fielset appear animation
+                opacity = 1 - now;
+
+                current_fs.css({
+                  display: "none",
+                  position: "relative",
+                });
+                next_fs.css({ opacity: opacity });
+              },
+              duration: 500,
+            }
+          );
+          setProgressBar(++current);
+        });
+
+        // $(".final_btn").click(function () {
+        //   current_fs = $(this).parent();
+        //   next_fs = current_fs;
+
+        //   //Add Class Active
+        //   $("#progressbar li")
+        //     .eq($("fieldset").index(next_fs))
+        //     .addClass("active");
+
+        //   //show the next fieldset
+        //   next_fs.show();
+        //   //hide the current fieldset with style
+        //   current_fs.animate(
+        //     { opacity: 0 },
+        //     {
+        //       step: function (now) {
+        //         // for making fielset appear animation
+        //         opacity = 1 - now;
+
+        //         current_fs.css({
+        //           display: "none",
+        //           position: "relative",
+        //         });
+        //         next_fs.css({ opacity: opacity });
+        //       },
+        //       duration: 500,
+        //     }
+        //   );
+        //   setProgressBar(++current);
+        // });
+
+        $(".previous").click(function () {
+          current_fs = $(this).parent();
+          previous_fs = $(this).parent().prev();
+
+          //Remove class active
+          $("#progressbar li")
+            .eq($("fieldset").index(current_fs))
+            .removeClass("active");
+
+          //show the previous fieldset
+          previous_fs.show();
+
+          //hide the current fieldset with style
+          current_fs.animate(
+            { opacity: 0 },
+            {
+              step: function (now) {
+                // for making fielset appear animation
+                opacity = 1 - now;
+
+                current_fs.css({
+                  display: "none",
+                  position: "relative",
+                });
+                previous_fs.css({ opacity: opacity });
+              },
+              duration: 500,
+            }
+          );
+          setProgressBar(--current);
+        });
+
+        function setProgressBar(curStep) {
+          var percent = parseFloat(100 / steps) * curStep;
+          percent = percent.toFixed();
+          $(".progress-bar").css("width", percent + "%");
+        }
+
+        var frm = $("#msform");
+
+        frm.submit(function (e) {
+          e.preventDefault();
+
+          options = [
+            "The content is about a topic that I am have been/am currently following and hence, have some prior knowledge about the stories around the content: (incident, trending news, person, etc.)",
+            "The excerpt is written in a style or is structured in a way that I find more authentic/believable",
+            "All of the above.",
+            "No reason/random choice.",
+          ];
+
+          var sex = function () {
+            var v;
+            $('[name="gender"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            return v;
+          };
+
+          var age = function () {
+            var v;
+            $('[name="age-group"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            return v;
+          };
+
+          var eng_lvl = function () {
+            var v;
+            $('[name="eng_level"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            return v;
+          };
+
+          questions = {
+            1: sent1,
+            2: sent2,
+          };
+
+          var q1 = function () {
+            var v;
+            $('[name="q1"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              return questions[parseInt(v)][array[0]][0];
+            } catch {
+              return " ";
+            }
+          };
+          var q1op = function () {
+            var v;
+            var s = "";
+            $('[name="q1-op"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              s = options[parseInt(v) - 1];
+            } catch {
+              s = "";
+            }
+            return s;
+          };
+          var q2 = function () {
+            var v;
+            $('[name="q2"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              return questions[parseInt(v)][array[1]][0];
+            } catch {
+              return " ";
+            }
+          };
+          var q2op = function () {
+            var v;
+            var s = "";
+            $('[name="q2-op"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              s = options[parseInt(v) - 1];
+            } catch {
+              s = "";
+            }
+            return s;
+          };
+          var q3 = function () {
+            var v;
+            $('[name="q3"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              return questions[parseInt(v)][array[2]][0];
+            } catch {
+              return " ";
+            }
+          };
+          var q3op = function () {
+            var v;
+            var s = "";
+            $('[name="q3-op"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              s = options[parseInt(v) - 1];
+            } catch {
+              s = "";
+            }
+            return s;
+          };
+          var q4 = function () {
+            var v;
+            $('[name="q4"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              return questions[parseInt(v)][array[3]][0];
+            } catch {
+              return " ";
+            }
+          };
+          var q4op = function () {
+            var v;
+            var s = "";
+            $('[name="q4-op"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              s = options[parseInt(v) - 1];
+            } catch {
+              s = "";
+            }
+            return s;
+          };
+          var q5 = function () {
+            var v;
+            $('[name="q5"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              return questions[parseInt(v)][array[4]][0];
+            } catch {
+              return " ";
+            }
+          };
+          var q5op = function () {
+            var v;
+            var s = "";
+            $('[name="q5-op"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              s = options[parseInt(v) - 1];
+            } catch {
+              s = "";
+            }
+            return s;
+          };
+          var q6 = function () {
+            var v;
+            $('[name="q6"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              return questions[parseInt(v)][array[5]][0];
+            } catch {
+              return " ";
+            }
+          };
+          var q6op = function () {
+            var v;
+            var s = "";
+            $('[name="q6-op"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              s = options[parseInt(v) - 1];
+            } catch {
+              s = "";
+            }
+            return s;
+          };
+          var q7 = function () {
+            var v;
+            $('[name="q7"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              return questions[parseInt(v)][array[6]][0];
+            } catch {
+              return " ";
+            }
+          };
+          var q7op = function () {
+            var v;
+            var s = "";
+            $('[name="q7-op"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              s = options[parseInt(v) - 1];
+            } catch {
+              s = "";
+            }
+            return s;
+          };
+          var q8 = function () {
+            var v;
+            $('[name="q8"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              return questions[parseInt(v)][array[7]][0];
+            } catch {
+              return " ";
+            }
+          };
+          var q8op = function () {
+            var v;
+            var s = "";
+            $('[name="q8-op"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              s = options[parseInt(v) - 1];
+            } catch {
+              s = "";
+            }
+            return s;
+          };
+          var q9 = function () {
+            var v;
+            $('[name="q9"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              return questions[parseInt(v)][array[8]][0];
+            } catch {
+              return " ";
+            }
+          };
+          var q9op = function () {
+            var v;
+            var s = "";
+            $('[name="q9-op"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              s = options[parseInt(v) - 1];
+            } catch {
+              s = "";
+            }
+            return s;
+          };
+          var q10 = function () {
+            var v;
+            $('[name="q10"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              return questions[parseInt(v)][array[9]][0];
+            } catch {
+              return " ";
+            }
+          };
+          var q10op = function () {
+            var v;
+            var s = "";
+            $('[name="q10-op"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              s = options[parseInt(v) - 1];
+            } catch {
+              s = "";
+            }
+            return s;
+          };
+          var q11 = function () {
+            var v;
+            $('[name="q11"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              return questions[parseInt(v)][array[10]][0];
+            } catch {
+              return " ";
+            }
+          };
+          var q11op = function () {
+            var v;
+            var s = "";
+            $('[name="q11-op"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              s = options[parseInt(v) - 1];
+            } catch {
+              s = "";
+            }
+            return s;
+          };
+          var q12 = function () {
+            var v;
+            $('[name="q12"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              return questions[parseInt(v)][array[11]][0];
+            } catch {
+              return " ";
+            }
+          };
+          var q12op = function () {
+            var v;
+            var s = "";
+            $('[name="q12-op"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              s = options[parseInt(v) - 1];
+            } catch {
+              s = "";
+            }
+            return s;
+          };
+          var q13 = function () {
+            var v;
+            $('[name="q13"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              return questions[parseInt(v)][array[12]][0];
+            } catch {
+              return " ";
+            }
+          };
+          var q13op = function () {
+            var v;
+            var s = "";
+            $('[name="q13-op"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              s = options[parseInt(v) - 1];
+            } catch {
+              s = "";
+            }
+            return s;
+          };
+          var q14 = function () {
+            var v;
+            $('[name="q14"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              return questions[parseInt(v)][array[13]][0];
+            } catch {
+              return " ";
+            }
+          };
+          var q14op = function () {
+            var v;
+            var s = "";
+            $('[name="q14-op"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              s = options[parseInt(v) - 1];
+            } catch {
+              s = "";
+            }
+            return s;
+          };
+          var q15 = function () {
+            var v;
+            $('[name="q15"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              return questions[parseInt(v)][array[14]][0];
+            } catch {
+              return " ";
+            }
+          };
+          var q15op = function () {
+            var v;
+            var s = "";
+            $('[name="q15-op"]').each(function () {
+              if ($(this).prop("checked") === true) v = $(this).val();
+            });
+            try {
+              s = options[parseInt(v) - 1];
+            } catch {
+              s = "";
+            }
+            return s;
+          };
+
+          var social = function () {
+            var sm = "";
+            $('[name="social_media"]').each(function () {
+              if ($(this).prop("checked") === true) sm += $(this).val() + ", ";
+            });
+            return sm;
+          };
+          var email = $("#email").val();
+          var twitter_usr = $("#twitter_usr").val();
+          var fb_usr = $("#fb_usr").val();
+          var linkedin_usr = $("#linkedin_usr").val();
+
+          var q_entry = [
+            "entry.1105551207",
+            "entry.1946991404",
+            "entry.1460523428",
+            "entry.1456817029",
+            "entry.798315413",
+            "entry.1657450846",
+            "entry.1907970081",
+            "entry.1274129246",
+            "entry.981132587",
+            "entry.211216229",
+            "entry.1205243349",
+            "entry.1590888605",
+            "entry.1415791946",
+            "entry.452691200",
+            "entry.578608229",
+          ];
+          var q_reason = [
+            "entry.635818241",
+            "entry.305563593",
+            "entry.527440062",
+            "entry.1933140435",
+            "entry.1643335181",
+            "entry.1574921109",
+            "entry.117241208",
+            "entry.154594485",
+            "entry.974805755",
+            "entry.1442968675",
+            "entry.704232272",
+            "entry.1740344871",
+            "entry.942272487",
+            "entry.1503134003",
+            "entry.1135758195",
+          ];
+
+          var data_sub = {
+            "entry.322776758": email,
+            "entry.1498719790": age(),
+            "entry.1319028744": sex(),
+            "entry.1683994281": social(),
+            "entry.1361308387": twitter_usr,
+            "entry.177392538": fb_usr,
+            "entry.98656439": linkedin_usr,
+            "entry.953009114": eng_lvl(),
+          };
+
+          data_sub[q_entry[array[0]]] = q1();
+          data_sub[q_reason[array[0]]] = q1op();
+          data_sub[q_entry[array[1]]] = q2();
+          data_sub[q_reason[array[1]]] = q2op();
+          data_sub[q_entry[array[2]]] = q3();
+          data_sub[q_reason[array[2]]] = q3op();
+          data_sub[q_entry[array[3]]] = q4();
+          data_sub[q_reason[array[3]]] = q4op();
+          data_sub[q_entry[array[4]]] = q5();
+          data_sub[q_reason[array[4]]] = q5op();
+          data_sub[q_entry[array[5]]] = q6();
+          data_sub[q_reason[array[5]]] = q6op();
+          data_sub[q_entry[array[6]]] = q7();
+          data_sub[q_reason[array[6]]] = q7op();
+          data_sub[q_entry[array[7]]] = q8();
+          data_sub[q_reason[array[7]]] = q8op();
+          data_sub[q_entry[array[8]]] = q9();
+          data_sub[q_reason[array[8]]] = q9op();
+          data_sub[q_entry[array[9]]] = q10();
+          data_sub[q_reason[array[9]]] = q10op();
+          data_sub[q_entry[array[10]]] = q11();
+          data_sub[q_reason[array[10]]] = q11op();
+          data_sub[q_entry[array[11]]] = q12();
+          data_sub[q_reason[array[11]]] = q12op();
+          data_sub[q_entry[array[12]]] = q13();
+          data_sub[q_reason[array[12]]] = q13op();
+          data_sub[q_entry[array[13]]] = q14();
+          data_sub[q_reason[array[13]]] = q14op();
+          data_sub[q_entry[array[14]]] = q15();
+          data_sub[q_reason[array[14]]] = q15op();
+
+          $.ajax({
+            type: frm.attr("method"),
+            url: frm.attr("action"),
+            data: data_sub,
+            success: function (data_sub) {
+              console.log("Submission was successful.");
+              console.log(data_sub);
+              console.log(array);
+            },
+            error: function (data_sub) {
+              console.log("An error occurred.");
+              window.location.href = "thank_you.html";
+              console.log(data_sub);
+              console.log(questions[1][array[0]]);
+              console.log(array);
+            },
+          });
+        });
+      });
+    </script>
+  </head>
+  <body oncontextmenu="return false" class="snippet-body">
+    <div class="container-fluid">
+      <div class="row justify-content-center">
+        <div
+          class="col-11 col-sm-9 col-md-7 col-lg-6 col-xl-5 text-center p-0 mt-3 mb-2"
+        >
+          <div class="card px-0 pt-4 pb-0 mt-3 mb-3">
+            <h2 id="heading">User Surveys</h2>
+
+            <form
+              id="msform"
+              action="https://docs.google.com/forms/u/1/d/e/1FAIpQLSf5zVzyvFTNHLx-p223QNeYXHzmaECWnRAFqwqEerTD7AYbww/formResponse"
+              method="post"
+            >
+              <div class="progress">
+                <div
+                  class="progress-bar progress-bar-striped progress-bar-animated"
+                  role="progressbar"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                ></div>
+              </div>
+              <br />
+              <fieldset>
+                <div class="form-card">
+                  <div class="row">
+                    <div class="col-7">
+                      <h2 class="fs-title">User Consent</h2>
+                    </div>
+                  </div>
+                  <p style="font-size: 0.9vw">
+                    Hello! Thank you for taking the time to take this survey.
+                    Your input is much appreciated. <br />
+                    <br />
+                    We're trying to gain an insight on how people decide a piece
+                    of information they read online is factually correct or
+                    not.<br /><br />
+                    The survey would take about 10 minutes to complete. We also
+                    wish to collect some demographical data such as your age,
+                    gender. We also wish to collect more private information
+                    such as your social media handles which might be used in the
+                    future for data collection purposes. This data would only be
+                    shared with the researchers working on the project, and
+                    complete anonymity of the participants would be maintained.
+                    Participation in the study is completely voluntary, and you
+                    can back out at any point in time. This is for research
+                    purposes only. <br />
+                    <br />
+
+                    Also, the study does not aim to actually gauge whether a
+                    news article is true or false, but rather what the user
+                    feels about its factual correctness. So the participants are
+                    requested to not use the internet to fact check the articles
+                    from the internet.<br /><br />
+
+                    In case of any questions/doubts/concerns or feedback please
+                    feel free to reach out to us on the email provided below:<br />
+                    Aditya Rastogi:
+                    <a href="mailto:aditya18273@iiitd.ac.in"
+                      >aditya18273@iiitd.ac.in</a
+                    ><br />
+                    Rituparna Mukherjee:
+                    <a href="mailto:ritumukherjee23@gmail.com"
+                      >ritumukherjee23@gmail.com</a
+                    >
+                  </p>
+                </div>
+                <input
+                  type="button"
+                  name="next"
+                  class="next action-button"
+                  value="Accept & Continue"
+                />
+              </fieldset>
+              <fieldset>
+                <div class="form-card">
+                  <div class="row">
+                    <div class="col-7">
+                      <h2 class="fs-title">User Data</h2>
+                      <p><mark class="red">*</mark> Required</p>
+                    </div>
+                  </div>
+                  <label class="fieldlabels"
+                    >E-mail Address <mark class="red">*</mark>
+                  </label>
+                  <input type="text" placeholder="E-mail Address" id="email" />
+                  <label class="fieldlabels">Age Group </label>
+                  <div class="control-group">
+                    <label class="control control--radio"
+                      >18-22
+                      <input type="radio" name="age-group" value="18-22" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >23-27
+                      <input type="radio" name="age-group" value="23-27" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >28-32
+                      <input type="radio" name="age-group" value="28-32" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >33-37
+                      <input type="radio" name="age-group" value="33-37" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >38-42
+                      <input type="radio" name="age-group" value="38-42" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >43-47
+                      <input type="radio" name="age-group" value="43-47" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >48-52
+                      <input type="radio" name="age-group" value="48-52" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >53+
+                      <input type="radio" name="age-group" value="53+" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <label class="fieldlabels">Gender</label>
+                  <div class="control-group">
+                    <label class="control control--radio"
+                      >Male
+                      <input type="radio" name="gender" value="male" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >Female
+                      <input type="radio" name="gender" value="female" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >Other
+                      <input type="radio" name="gender" value="other" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <label class="fieldlabels"
+                    >Most Frequently Used Social Media Platforms
+                  </label>
+                  <div class="control-group">
+                    <label class="control control--checkbox"
+                      >Twitter
+                      <input
+                        type="checkbox"
+                        name="social_media"
+                        value="Twitter"
+                      />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--checkbox"
+                      >Facebook
+                      <input
+                        type="checkbox"
+                        name="social_media"
+                        value="Facebook"
+                      />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--checkbox"
+                      >LinkedIn
+                      <input
+                        type="checkbox"
+                        name="social_media"
+                        value="LinkedIn"
+                      />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <label class="fieldlabels"
+                    >Your Social Media Handle/Username (Twitter)</label
+                  >
+                  <input
+                    type="text"
+                    placeholder="Enter your Handle"
+                    id="twitter_usr"
+                  />
+                  <label class="fieldlabels"
+                    >Your Social Media Handle/Username (Facebook)</label
+                  >
+                  <input
+                    type="text"
+                    placeholder="Enter your Handle"
+                    id="fb_usr"
+                  />
+                  <label class="fieldlabels"
+                    >Your Social Media Handle/Username (LinkedIn)</label
+                  >
+                  <input
+                    type="text"
+                    placeholder="Enter your Handle"
+                    id="linkedin_usr"
+                  />
+                  <label class="fieldlabels"
+                    >How would you rate your English Reading and Comprehension
+                    Skills? <mark class="red">*</mark>
+                  </label>
+                  <div class="control-group">
+                    <label class="control control--radio"
+                      >1 - Elementary Proficiency
+                      <input type="radio" name="eng_level" value="1" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >2 - Limited Working Proficiency
+                      <input type="radio" name="eng_level" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >3 - Professional Working Proficiency
+                      <input type="radio" name="eng_level" value="3" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >4 - Full Professional Proficiency
+                      <input type="radio" name="eng_level" value="4" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >5 - Native/Bilingual Proficiency
+                      <input type="radio" name="eng_level" value="5" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                </div>
+                <input
+                  type="button"
+                  name="next"
+                  class="next action-button"
+                  value="Next"
+                />
+                <input
+                  type="button"
+                  name="previous"
+                  class="previous action-button-previous"
+                  value="Previous"
+                />
+              </fieldset>
+              <fieldset>
+                <div class="form-card">
+                  <div class="row">
+                    <div class="col-7">
+                      <h2 class="fs-title">Instructions for Questions</h2>
+                    </div>
+                  </div>
+                  <p style="font-size: 0.9vw">
+                    The survey has a total of 15 questions and in each question,
+                    you would be provided with a choice of two fictional
+                    excerpts (and not picked up from online sources), and you
+                    would be asked to choose the excerpt which you are more
+                    likely to share and also why you chose a particular
+                    excerpt.<br /><br />
+                    You would be provided with three sets of 5 questions, and
+                    after completing each set of 5 questions, you would either
+                    be able to submit the form and finish the survey or continue
+                    with the survey and fill up the next set of 5 questions.
+                  </p>
+                </div>
+                <input
+                  type="button"
+                  name="next"
+                  class="next action-button"
+                  value="Next"
+                />
+                <input
+                  type="button"
+                  name="previous"
+                  class="previous action-button-previous"
+                  value="Previous"
+                />
+              </fieldset>
+              <fieldset>
+                <div class="form-card">
+                  <div class="row">
+                    <div class="col-7">
+                      <h2 class="fs-title">Questions</h2>
+                    </div>
+                  </div>
+                  <h4 class="fs-title" style="font-size: 20px">Q1</h4>
+                  <label class="fieldlabels"
+                    >Which of the following online contents are you more likely
+                    to reshare?
+                  </label>
+                  <div class="control-group">
+                    <label class="control control--radio"
+                      ><div id="q1a"></div>
+                      <input type="radio" name="q1" value="1" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      ><div id="q1b"></div>
+                      <input type="radio" name="q1" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <label class="fieldlabels"
+                    >Why did you choose that particular excerpt?</label
+                  >
+                  <div class="control-group">
+                    <label class="control control--radio">
+                      <input type="radio" name="q1-op" value="1" />The content
+                      is about a topic that I am have been/am currently
+                      following and hence, have some prior knowledge about the
+                      stories around the content: (incident, trending news,
+                      person, etc.)
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >The excerpt is written in a style or is structured in a
+                      way that I find more authentic/believable
+                      <input type="radio" name="q1-op" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >All of the above.
+                      <input type="radio" name="q1-op" value="3" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >No reason/random choice.
+                      <input type="radio" name="q1-op" value="4" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <h4 class="fs-title" style="font-size: 20px">Q2</h4>
+                  <label class="fieldlabels"
+                    >Which of the following online contents are you more likely
+                    to reshare?
+                  </label>
+                  <div class="control-group">
+                    <label class="control control--radio"
+                      ><div id="q2a"></div>
+                      <input type="radio" name="q2" value="1" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      ><div id="q2b"></div>
+                      <input type="radio" name="q2" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <label class="fieldlabels"
+                    >Why did you choose that particular excerpt?</label
+                  >
+                  <div class="control-group">
+                    <label class="control control--radio">
+                      <input type="radio" name="q2-op" value="1" />The content
+                      is about a topic that I am have been/am currently
+                      following and hence, have some prior knowledge about the
+                      stories around the content: (incident, trending news,
+                      person, etc.)
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >The excerpt is written in a style or is structured in a
+                      way that I find more authentic/believable
+                      <input type="radio" name="q2-op" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >All of the above.
+                      <input type="radio" name="q2-op" value="3" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >No reason/random choice.
+                      <input type="radio" name="q2-op" value="4" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <h4 class="fs-title" style="font-size: 20px">Q3</h4>
+                  <label class="fieldlabels"
+                    >Which of the following online contents are you more likely
+                    to reshare?
+                  </label>
+                  <div class="control-group">
+                    <label class="control control--radio"
+                      ><div id="q3a"></div>
+                      <input type="radio" name="q3" value="1" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      ><div id="q3b"></div>
+                      <input type="radio" name="q3" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <label class="fieldlabels"
+                    >Why did you choose that particular excerpt?</label
+                  >
+                  <div class="control-group">
+                    <label class="control control--radio">
+                      <input type="radio" name="q3-op" value="1" />The content
+                      is about a topic that I am have been/am currently
+                      following and hence, have some prior knowledge about the
+                      stories around the content: (incident, trending news,
+                      person, etc.)
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >The excerpt is written in a style or is structured in a
+                      way that I find more authentic/believable
+                      <input type="radio" name="q3-op" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >All of the above.
+                      <input type="radio" name="q3-op" value="3" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >No reason/random choice.
+                      <input type="radio" name="q3-op" value="4" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <h4 class="fs-title" style="font-size: 20px">Q4</h4>
+                  <label class="fieldlabels"
+                    >Which of the following online contents are you more likely
+                    to reshare?
+                  </label>
+                  <div class="control-group">
+                    <label class="control control--radio"
+                      ><div id="q4a"></div>
+                      <input type="radio" name="q4" value="1" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      ><div id="q4b"></div>
+                      <input type="radio" name="q4" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <label class="fieldlabels"
+                    >Why did you choose that particular excerpt?</label
+                  >
+                  <div class="control-group">
+                    <label class="control control--radio">
+                      <input type="radio" name="q4-op" value="1" />The content
+                      is about a topic that I am have been/am currently
+                      following and hence, have some prior knowledge about the
+                      stories around the content: (incident, trending news,
+                      person, etc.)
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >The excerpt is written in a style or is structured in a
+                      way that I find more authentic/believable
+                      <input type="radio" name="q4-op" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >All of the above.
+                      <input type="radio" name="q4-op" value="3" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >No reason/random choice.
+                      <input type="radio" name="q4-op" value="4" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <h4 class="fs-title" style="font-size: 20px">Q5</h4>
+                  <label class="fieldlabels"
+                    >Which of the following online contents are you more likely
+                    to reshare?
+                  </label>
+                  <div class="control-group">
+                    <label class="control control--radio"
+                      ><div id="q5a"></div>
+                      <input type="radio" name="q5" value="1" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      ><div id="q5b"></div>
+                      <input type="radio" name="q5" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <label class="fieldlabels"
+                    >Why did you choose that particular excerpt?</label
+                  >
+                  <div class="control-group">
+                    <label class="control control--radio">
+                      <input type="radio" name="q5-op" value="1" />The content
+                      is about a topic that I am have been/am currently
+                      following and hence, have some prior knowledge about the
+                      stories around the content: (incident, trending news,
+                      person, etc.)
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >The excerpt is written in a style or is structured in a
+                      way that I find more authentic/believable
+                      <input type="radio" name="q5-op" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >All of the above.
+                      <input type="radio" name="q5-op" value="3" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >No reason/random choice.
+                      <input type="radio" name="q5-op" value="4" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                </div>
+                <input
+                  type="button"
+                  name="next"
+                  class="next action-button"
+                  value="Continue & Next"
+                />
+                <input
+                  type="submit"
+                  name="next"
+                  class="next action-button"
+                  value="Submit"
+                />
+                <input
+                  type="button"
+                  name="previous"
+                  class="previous action-button-previous"
+                  value="Previous"
+                />
+              </fieldset>
+              <fieldset>
+                <div class="form-card">
+                  <div class="row">
+                    <div class="col-7">
+                      <h2 class="fs-title">Questions</h2>
+                    </div>
+                  </div>
+                  <h4 class="fs-title" style="font-size: 20px">Q1</h4>
+                  <label class="fieldlabels"
+                    >Which of the following online contents are you more likely
+                    to reshare?
+                  </label>
+                  <div class="control-group">
+                    <label class="control control--radio"
+                      ><div id="q6a"></div>
+                      <input type="radio" name="q6" value="1" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      ><div id="q6b"></div>
+                      <input type="radio" name="q6" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <label class="fieldlabels"
+                    >Why did you choose that particular excerpt?</label
+                  >
+                  <div class="control-group">
+                    <label class="control control--radio">
+                      <input type="radio" name="q6-op" value="1" />The content
+                      is about a topic that I am have been/am currently
+                      following and hence, have some prior knowledge about the
+                      stories around the content: (incident, trending news,
+                      person, etc.)
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >The excerpt is written in a style or is structured in a
+                      way that I find more authentic/believable
+                      <input type="radio" name="q6-op" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >All of the above.
+                      <input type="radio" name="q6-op" value="3" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >No reason/random choice.
+                      <input type="radio" name="q6-op" value="4" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <h4 class="fs-title" style="font-size: 20px">Q2</h4>
+                  <label class="fieldlabels"
+                    >Which of the following online contents are you more likely
+                    to reshare?
+                  </label>
+                  <div class="control-group">
+                    <label class="control control--radio"
+                      ><div id="q7a"></div>
+                      <input type="radio" name="q7" value="1" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      ><div id="q7b"></div>
+                      <input type="radio" name="q7" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <label class="fieldlabels"
+                    >Why did you choose that particular excerpt?</label
+                  >
+                  <div class="control-group">
+                    <label class="control control--radio">
+                      <input type="radio" name="q7-op" value="1" />The content
+                      is about a topic that I am have been/am currently
+                      following and hence, have some prior knowledge about the
+                      stories around the content: (incident, trending news,
+                      person, etc.)
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >The excerpt is written in a style or is structured in a
+                      way that I find more authentic/believable
+                      <input type="radio" name="q7-op" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >All of the above.
+                      <input type="radio" name="q7-op" value="3" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >No reason/random choice.
+                      <input type="radio" name="q7-op" value="4" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <h4 class="fs-title" style="font-size: 20px">Q3</h4>
+                  <label class="fieldlabels"
+                    >Which of the following online contents are you more likely
+                    to reshare?
+                  </label>
+                  <div class="control-group">
+                    <label class="control control--radio"
+                      ><div id="q8a"></div>
+                      <input type="radio" name="q8" value="1" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      ><div id="q8b"></div>
+                      <input type="radio" name="q8" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <label class="fieldlabels"
+                    >Why did you choose that particular excerpt?</label
+                  >
+                  <div class="control-group">
+                    <label class="control control--radio">
+                      <input type="radio" name="q8-op" value="1" />The content
+                      is about a topic that I am have been/am currently
+                      following and hence, have some prior knowledge about the
+                      stories around the content: (incident, trending news,
+                      person, etc.)
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >The excerpt is written in a style or is structured in a
+                      way that I find more authentic/believable
+                      <input type="radio" name="q8-op" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >All of the above.
+                      <input type="radio" name="q8-op" value="3" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >No reason/random choice.
+                      <input type="radio" name="q8-op" value="4" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <h4 class="fs-title" style="font-size: 20px">Q4</h4>
+                  <label class="fieldlabels"
+                    >Which of the following online contents are you more likely
+                    to reshare?
+                  </label>
+                  <div class="control-group">
+                    <label class="control control--radio"
+                      ><div id="q9a"></div>
+                      <input type="radio" name="q9" value="1" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      ><div id="q9b"></div>
+                      <input type="radio" name="q9" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <label class="fieldlabels"
+                    >Why did you choose that particular excerpt?</label
+                  >
+                  <div class="control-group">
+                    <label class="control control--radio">
+                      <input type="radio" name="q9-op" value="1" />The content
+                      is about a topic that I am have been/am currently
+                      following and hence, have some prior knowledge about the
+                      stories around the content: (incident, trending news,
+                      person, etc.)
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >The excerpt is written in a style or is structured in a
+                      way that I find more authentic/believable
+                      <input type="radio" name="q9-op" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >All of the above.
+                      <input type="radio" name="q9-op" value="3" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >No reason/random choice.
+                      <input type="radio" name="q9-op" value="4" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <h4 class="fs-title" style="font-size: 20px">Q5</h4>
+                  <label class="fieldlabels"
+                    >Which of the following online contents are you more likely
+                    to reshare?
+                  </label>
+                  <div class="control-group">
+                    <label class="control control--radio"
+                      ><div id="q10a"></div>
+                      <input type="radio" name="q10" value="1" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      ><div id="q10b"></div>
+                      <input type="radio" name="q10" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <label class="fieldlabels"
+                    >Why did you choose that particular excerpt?</label
+                  >
+                  <div class="control-group">
+                    <label class="control control--radio">
+                      <input type="radio" name="q10-op" value="1" />The content
+                      is about a topic that I am have been/am currently
+                      following and hence, have some prior knowledge about the
+                      stories around the content: (incident, trending news,
+                      person, etc.)
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >The excerpt is written in a style or is structured in a
+                      way that I find more authentic/believable
+                      <input type="radio" name="q10-op" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >All of the above.
+                      <input type="radio" name="q10-op" value="3" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >No reason/random choice.
+                      <input type="radio" name="q10-op" value="4" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                </div>
+                <input
+                  type="button"
+                  name="next"
+                  class="next action-button"
+                  value="Continue & Next"
+                />
+                <input
+                  type="submit"
+                  name="final"
+                  class="final action-button"
+                  value="Submit"
+                />
+                <input
+                  type="button"
+                  name="previous"
+                  class="previous action-button-previous"
+                  value="Previous"
+                />
+              </fieldset>
+              <fieldset>
+                <div class="form-card">
+                  <div class="row">
+                    <div class="col-7">
+                      <h2 class="fs-title">Questions</h2>
+                    </div>
+                  </div>
+                  <h4 class="fs-title" style="font-size: 20px">Q1</h4>
+                  <label class="fieldlabels"
+                    >Which of the following online contents are you more likely
+                    to reshare?
+                  </label>
+                  <div class="control-group">
+                    <label class="control control--radio"
+                      ><div id="q11a"></div>
+                      <input type="radio" name="q11" value="1" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      ><div id="q11b"></div>
+                      <input type="radio" name="q11" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <label class="fieldlabels"
+                    >Why did you choose that particular excerpt?</label
+                  >
+                  <div class="control-group">
+                    <label class="control control--radio">
+                      <input type="radio" name="q11-op" value="1" />The content
+                      is about a topic that I am have been/am currently
+                      following and hence, have some prior knowledge about the
+                      stories around the content: (incident, trending news,
+                      person, etc.)
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >The excerpt is written in a style or is structured in a
+                      way that I find more authentic/believable
+                      <input type="radio" name="q11-op" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >All of the above.
+                      <input type="radio" name="q11-op" value="3" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >No reason/random choice.
+                      <input type="radio" name="q11-op" value="4" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <h4 class="fs-title" style="font-size: 20px">Q2</h4>
+                  <label class="fieldlabels"
+                    >Which of the following online contents are you more likely
+                    to reshare?
+                  </label>
+                  <div class="control-group">
+                    <label class="control control--radio"
+                      ><div id="q12a"></div>
+                      <input type="radio" name="q12" value="1" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      ><div id="q12b"></div>
+                      <input type="radio" name="q12" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <label class="fieldlabels"
+                    >Why did you choose that particular excerpt?</label
+                  >
+                  <div class="control-group">
+                    <label class="control control--radio">
+                      <input type="radio" name="q12-op" value="1" />The content
+                      is about a topic that I am have been/am currently
+                      following and hence, have some prior knowledge about the
+                      stories around the content: (incident, trending news,
+                      person, etc.)
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >The excerpt is written in a style or is structured in a
+                      way that I find more authentic/believable
+                      <input type="radio" name="q12-op" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >All of the above.
+                      <input type="radio" name="q12-op" value="3" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >No reason/random choice.
+                      <input type="radio" name="q12-op" value="4" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <h4 class="fs-title" style="font-size: 20px">Q3</h4>
+                  <label class="fieldlabels"
+                    >Which of the following online contents are you more likely
+                    to reshare?
+                  </label>
+                  <div class="control-group">
+                    <label class="control control--radio"
+                      ><div id="q13a"></div>
+                      <input type="radio" name="q13" value="1" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      ><div id="q13b"></div>
+                      <input type="radio" name="q13" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <label class="fieldlabels"
+                    >Why did you choose that particular excerpt?</label
+                  >
+                  <div class="control-group">
+                    <label class="control control--radio">
+                      <input type="radio" name="q13-op" value="1" />The content
+                      is about a topic that I am have been/am currently
+                      following and hence, have some prior knowledge about the
+                      stories around the content: (incident, trending news,
+                      person, etc.)
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >The excerpt is written in a style or is structured in a
+                      way that I find more authentic/believable
+                      <input type="radio" name="q13-op" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >All of the above.
+                      <input type="radio" name="q13-op" value="3" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >No reason/random choice.
+                      <input type="radio" name="q13-op" value="4" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <h4 class="fs-title" style="font-size: 20px">Q4</h4>
+                  <label class="fieldlabels"
+                    >Which of the following online contents are you more likely
+                    to reshare?
+                  </label>
+                  <div class="control-group">
+                    <label class="control control--radio"
+                      ><div id="q14a"></div>
+                      <input type="radio" name="q14" value="1" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      ><div id="q14b"></div>
+                      <input type="radio" name="q14" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <label class="fieldlabels"
+                    >Why did you choose that particular excerpt?</label
+                  >
+                  <div class="control-group">
+                    <label class="control control--radio">
+                      <input type="radio" name="q14-op" value="1" />The content
+                      is about a topic that I am have been/am currently
+                      following and hence, have some prior knowledge about the
+                      stories around the content: (incident, trending news,
+                      person, etc.)
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >The excerpt is written in a style or is structured in a
+                      way that I find more authentic/believable
+                      <input type="radio" name="q14-op" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >All of the above.
+                      <input type="radio" name="q14-op" value="3" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >No reason/random choice.
+                      <input type="radio" name="q14-op" value="4" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <h4 class="fs-title" style="font-size: 20px">Q5</h4>
+                  <label class="fieldlabels"
+                    >Which of the following online contents are you more likely
+                    to reshare?
+                  </label>
+                  <div class="control-group">
+                    <label class="control control--radio"
+                      ><div id="q15a"></div>
+                      <input type="radio" name="q15" value="1" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      ><div id="q15b"></div>
+                      <input type="radio" name="q15" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                  <label class="fieldlabels"
+                    >Why did you choose that particular excerpt?</label
+                  >
+                  <div class="control-group">
+                    <label class="control control--radio">
+                      <input type="radio" name="q15-op" value="1" />The content
+                      is about a topic that I am have been/am currently
+                      following and hence, have some prior knowledge about the
+                      stories around the content: (incident, trending news,
+                      person, etc.)
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >The excerpt is written in a style or is structured in a
+                      way that I find more authentic/believable
+                      <input type="radio" name="q15-op" value="2" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >All of the above.
+                      <input type="radio" name="q15-op" value="3" />
+                      <div class="control__indicator"></div>
+                    </label>
+                    <label class="control control--radio"
+                      >No reason/random choice.
+                      <input type="radio" name="q15-op" value="4" />
+                      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                </div>
+                <input
+                  type="submit"
+                  name="next"
+                  class="next action-button"
+                  value="Submit"
+                />
+                <input
+                  type="button"
+                  name="previous"
+                  class="previous action-button-previous"
+                  value="Previous"
+                />
+              </fieldset>
+              <fieldset>
+                <div class="form-card">
+                  <div class="row">
+                    <div class="col-7">
+                      <h2 class="fs-title">
+                        Thanks a lot for filling out the Survey
+                      </h2>
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      var array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+      var sent1 = [
+        [
+          "The United Nations has decided to increase the land area size of the Bali heritage center from 59,844 square kilometers to 59,950 square kilometers to include 3 more bordering areas",
+          0,
+        ],
+        [
+          "According to the annual survey of international travel and tourism report, the average number of people travelling by air and train per day has unexpectedly risen by almost 11%, from 1.5 lakhs to 1.6 lakhs, an all-time high in 2020",
+          1,
+        ],
+        [
+          "About seventy-one percent users responded negatively to the new changes introduced in the election committee.",
+          2,
+        ],
+        [
+          "The new tech giants in Silicon Valley are ready to open up 50k new positions for fresh graduates.",
+          3,
+        ],
+        [
+          "Homeless teenagers rescued from a dangerous trap, rescuer happy to adopt one of them to free her from living a life in chains",
+          4,
+        ],
+        [
+          "Popular soap opera actor enjoys a weekend in Bali post breakup with girlfriend of 6 years, posts images online.",
+          5,
+        ],
+        [
+          "A 19-year-old girl dies in a fatal vehicle crash: 6 men injured, including a truck driver and 2 bikers. The incident disrupted local transportations for 48 hours.",
+          6,
+        ],
+        [
+          "Three out of five students survived the car crash that happened on the National Highway yesterday.",
+          7,
+        ],
+        [
+          "With the killer still on the loose, police officials are leaving no stone unturned to catch him.",
+          8,
+        ],
+        [
+          "Since Daniel's red card against Bull Warriors in the football league match on Tuesday, things have only gone downhill for his team.",
+          9,
+        ],
+        [
+          "More than 87% of members from the international association of teachers have demanded a new custom to be introduced in 978 primary schools across the globe.",
+          10,
+        ],
+        [
+          "Latest medical science research claims speedy recovery from cancer - a ray of hope for many.",
+          11,
+        ],
+        [
+          "The UN warns nine of its newest members that any irregularity will not be spared by the new rules set up by the general assembly.",
+          12,
+        ],
+        [
+          "A group of 29 pro-Republicans in Texas have been accused of breaking into over a dozen houses and beating up black residents. Nineteen injured and 3 hospitalized",
+          13,
+        ],
+        [
+          "Man’s third plea is accepted after the first two being rejected for his release from behind bars after being falsely accused by close relatives.",
+          14,
+        ],
+      ];
+      var sent2 = [
+        [
+          "The UN, as a part of its Archaeological Expansion plan, has decided to increase the land area of the Bali heritage center; the move aims to increase tourism in the area.",
+          0,
+        ],
+        [
+          "According to the annual survey of international travel and tourism report, the average number of people travelling by both air and railways has significantly risen in 2020, since their privatisation.",
+          1,
+        ],
+        [
+          "About twenty-nine percent users responded positively to the new changes introduced in the election committee.",
+          2,
+        ],
+        [
+          "Old companies in the Silicon Valley region have said no to fresh hiring this season, startups are the only options for fresh graduates this year.",
+          3,
+        ],
+        [
+          "Rescuer, who saved three homeless teenagers from a dangerous trap, offers to adopt the youngest of the teenagers.",
+          4,
+        ],
+        [
+          "Popular TV series actor says he is drowning in a sea of grief after a recent breakup, but his Jazzy posts speak otherwise.",
+          5,
+        ],
+        [
+          "A young girl amongst others suffered a fatal car crash on the main highway leading to extremely long traffic jams in the area on Tuesday.",
+          6,
+        ],
+        [
+          "Two out of five students died in the car crash that happened on the National Highway yesterday.",
+          7,
+        ],
+        [
+          "The accused in the Kothra case has been on the run since 10 days, with the police till being unable to catch him.",
+          8,
+        ],
+        [
+          "Even Daniel’s aggressive nature of play on Tuesday could not help the Bull Warriors win their match against the Red Knights.",
+          9,
+        ],
+        [
+          "The international association of teachers have demanded a news custom to be introduced in many primary schools throughout the world keeping in mind the recent cases of school shootings.",
+          10,
+        ],
+        [
+          "Latest medical science research claims speedy recovery from cancer, medical trials for the elderly have to begin from next month.",
+          11,
+        ],
+        [
+          "The UN informed nine of its newest members of the new rules set up by the general assembly and also their associated penalties.",
+          12,
+        ],
+        [
+          "A group of armed Republican supporters broke into over a dozen households in a black neighbourhood, during the election rally. All violators have now been arrested.",
+          13,
+        ],
+        [
+          "Man returns home after spending eight years behind bars on false allegations made by close relatives.",
+          14,
+        ],
+      ];
+
+      for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+      }
+      var trred = $("fieldset");
+      console.log(trred);
+      // console.log(array);
+      // console.log(document.getElementById("q1a"));
+      document.getElementById("q1a").innerHTML = sent1[array[0]][0];
+      document.getElementById("q1b").innerHTML = sent2[array[0]][0];
+      document.getElementById("q2a").innerHTML = sent1[array[1]][0];
+      document.getElementById("q2b").innerHTML = sent2[array[1]][0];
+      document.getElementById("q3a").innerHTML = sent1[array[2]][0];
+      document.getElementById("q3b").innerHTML = sent2[array[2]][0];
+      document.getElementById("q4a").innerHTML = sent1[array[3]][0];
+      document.getElementById("q4b").innerHTML = sent2[array[3]][0];
+      document.getElementById("q5a").innerHTML = sent1[array[4]][0];
+      document.getElementById("q5b").innerHTML = sent2[array[4]][0];
+      document.getElementById("q6a").innerHTML = sent1[array[5]][0];
+      document.getElementById("q6b").innerHTML = sent2[array[5]][0];
+      document.getElementById("q7a").innerHTML = sent1[array[6]][0];
+      document.getElementById("q7b").innerHTML = sent2[array[6]][0];
+      document.getElementById("q8a").innerHTML = sent1[array[7]][0];
+      document.getElementById("q8b").innerHTML = sent2[array[7]][0];
+      document.getElementById("q9a").innerHTML = sent2[array[8]][0];
+      document.getElementById("q9b").innerHTML = sent2[array[8]][0];
+      document.getElementById("q10a").innerHTML = sent1[array[9]][0];
+      document.getElementById("q10b").innerHTML = sent2[array[9]][0];
+      document.getElementById("q11a").innerHTML = sent1[array[10]][0];
+      document.getElementById("q11b").innerHTML = sent2[array[10]][0];
+      document.getElementById("q12a").innerHTML = sent1[array[11]][0];
+      document.getElementById("q12b").innerHTML = sent2[array[11]][0];
+      document.getElementById("q13a").innerHTML = sent1[array[12]][0];
+      document.getElementById("q13b").innerHTML = sent2[array[12]][0];
+      document.getElementById("q14a").innerHTML = sent1[array[13]][0];
+      document.getElementById("q14b").innerHTML = sent2[array[13]][0];
+      document.getElementById("q15a").innerHTML = sent1[array[14]][0];
+      document.getElementById("q15b").innerHTML = sent2[array[14]][0];
+      // console.log(sent2[array[0]]);
+      // console.log(array);
+    </script>
+  </body>
+</html>
